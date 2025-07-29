@@ -27,12 +27,153 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tomato-timer.timer-active {
+    padding: 20px 30px;
+    min-height: 500px;
 }
 
 .tomato-timer:hover {
     transform: translateY(-5px);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* 大番茄时钟样式 */
+.big-tomato-clock {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.big-tomato-icon {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 30px;
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: bigPulse 2s infinite;
+    box-shadow: 0 15px 35px rgba(255, 107, 107, 0.3);
+}
+
+.big-tomato-icon::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 20px;
+    background: #4caf50;
+    border-radius: 15px 15px 0 0;
+}
+
+.big-tomato-emoji {
+    font-size: 100px;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+    z-index: 2;
+}
+
+@keyframes bigPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+.big-timer-display {
+    font-size: 4.5rem;
+    font-weight: 300;
+    color: #333;
+    margin: 20px 0;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.big-timer-display.running {
+    color: #ff6b6b;
+    animation: bigGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes bigGlow {
+    from {
+        text-shadow: 0 0 8px #ff6b6b, 0 0 15px #ff6b6b, 0 0 22px #ff6b6b;
+    }
+
+    to {
+        text-shadow: 0 0 15px #ff6b6b, 0 0 25px #ff6b6b, 0 0 35px #ff6b6b;
+    }
+}
+
+.big-status-text {
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+/* 底部控制按钮 */
+.bottom-controls {
+    margin-top: auto;
+    padding-top: 20px;
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 原始界面样式 */
+.initial-interface {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .tomato-icon {
@@ -152,6 +293,31 @@ body {
     background: linear-gradient(45deg, #fa709a, #fee140);
 }
 
+.start-btn {
+    font-size: 1.2rem;
+    padding: 15px 30px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-5px);
+    }
+
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
 .time-buttons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -244,10 +410,40 @@ body {
     transition: stroke-dashoffset 0.3s ease;
 }
 
+.big-progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.big-progress-ring circle {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+}
+
+.big-progress-ring .bg {
+    stroke: rgba(255, 255, 255, 0.3);
+}
+
+.big-progress-ring .progress {
+    stroke: #4caf50;
+    stroke-dasharray: 502;
+    stroke-dashoffset: 502;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
 @media (max-width: 480px) {
     .tomato-timer {
         padding: 30px 20px;
         border-radius: 25px;
+    }
+
+    .tomato-timer.timer-active {
+        padding: 20px 20px;
     }
 
     .tomato-icon {
@@ -259,8 +455,21 @@ body {
         font-size: 50px;
     }
 
+    .big-tomato-icon {
+        width: 150px;
+        height: 150px;
+    }
+
+    .big-tomato-emoji {
+        font-size: 75px;
+    }
+
     .timer-display {
         font-size: 2.5rem;
+    }
+
+    .big-timer-display {
+        font-size: 3rem;
     }
 
     .time-buttons {

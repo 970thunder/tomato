@@ -1,93 +1,133 @@
 <template>
-  <div class="tomato-timer">
-    <!-- 番茄图标 -->
-    <div class="tomato-icon">
-      <svg class="progress-ring" width="120" height="120">
-        <circle
-          class="bg"
-          cx="60"
-          cy="60"
-          r="45"
+  <div class="tomato-timer" :class="{ 'timer-active': isRunning || isPaused }">
+    <!-- 大番茄时钟（仅在计时时显示） -->
+    <div v-if="isRunning || isPaused" class="big-tomato-clock">
+      <div class="big-tomato-icon">
+        <svg class="big-progress-ring" width="200" height="200">
+          <circle
+            class="bg"
+            cx="100"
+            cy="100"
+            r="80"
+          />
+          <circle
+            class="progress"
+            cx="100"
+            cy="100"
+            r="80"
+            :stroke-dashoffset="bigProgressOffset"
+          />
+        </svg>
+        <div class="big-tomato-emoji">🍅</div>
+      </div>
+      
+      <!-- 大时间显示 -->
+      <div class="big-timer-display" :class="{ running: isRunning }">
+        {{ formatTime(timeLeft) }}
+      </div>
+      
+      <!-- 大状态文本 -->
+      <div class="big-status-text">
+        {{ statusText }}
+      </div>
+    </div>
+
+    <!-- 原始界面（仅在未开始计时时显示） -->
+    <div v-if="!isRunning && !isPaused" class="initial-interface">
+      <!-- 番茄图标 -->
+      <div class="tomato-icon">
+        <svg class="progress-ring" width="120" height="120">
+          <circle
+            class="bg"
+            cx="60"
+            cy="60"
+            r="45"
+          />
+          <circle
+            class="progress"
+            cx="60"
+            cy="60"
+            r="45"
+            :stroke-dashoffset="progressOffset"
+          />
+        </svg>
+      </div>
+
+      <!-- 时间显示 -->
+      <div class="timer-display">
+        {{ formatTime(timeLeft) }}
+      </div>
+
+      <!-- 状态文本 -->
+      <div class="status-text">
+        {{ statusText }}
+      </div>
+
+      <!-- 时间选择按钮 -->
+      <div class="time-buttons">
+        <button
+          v-for="time in timeOptions"
+          :key="time.value"
+          class="time-btn"
+          :class="{ active: selectedTime === time.value }"
+          @click="selectTime(time.value)"
+        >
+          {{ time.label }}
+        </button>
+      </div>
+
+      <!-- 自定义时间输入 -->
+      <div class="custom-time">
+        <label>自定义时间:</label>
+        <input
+          v-model="customMinutes"
+          type="number"
+          min="1"
+          max="120"
+          placeholder="分钟"
+          @keyup.enter="startCustomTimer"
         />
-        <circle
-          class="progress"
-          cx="60"
-          cy="60"
-          r="45"
-          :stroke-dashoffset="progressOffset"
-        />
-      </svg>
+        <button class="btn secondary" @click="startCustomTimer">
+          开始
+        </button>
+      </div>
+
+      <!-- 开始按钮 -->
+      <div class="control-buttons">
+        <button
+          v-if="timeLeft > 0"
+          class="btn success start-btn"
+          @click="startTimer"
+        >
+          开始专注
+        </button>
+      </div>
     </div>
 
-    <!-- 时间显示 -->
-    <div class="timer-display" :class="{ running: isRunning }">
-      {{ formatTime(timeLeft) }}
-    </div>
-
-    <!-- 状态文本 -->
-    <div class="status-text">
-      {{ statusText }}
-    </div>
-
-    <!-- 时间选择按钮 -->
-    <div class="time-buttons">
-      <button
-        v-for="time in timeOptions"
-        :key="time.value"
-        class="time-btn"
-        :class="{ active: selectedTime === time.value }"
-        @click="selectTime(time.value)"
-      >
-        {{ time.label }}
-      </button>
-    </div>
-
-    <!-- 自定义时间输入 -->
-    <div class="custom-time">
-      <label>自定义时间:</label>
-      <input
-        v-model="customMinutes"
-        type="number"
-        min="1"
-        max="120"
-        placeholder="分钟"
-        @keyup.enter="startCustomTimer"
-      />
-      <button class="btn secondary" @click="startCustomTimer">
-        开始
-      </button>
-    </div>
-
-    <!-- 控制按钮 -->
-    <div class="control-buttons">
-      <button
-        v-if="!isRunning && timeLeft > 0"
-        class="btn success"
-        @click="startTimer"
-      >
-        开始
-      </button>
-      <button
-        v-if="isRunning"
-        class="btn secondary"
-        @click="pauseTimer"
-      >
-        暂停
-      </button>
-      <button
-        v-if="isPaused"
-        class="btn success"
-        @click="resumeTimer"
-      >
-        继续
-      </button>
-      <button
-        v-if="isRunning || isPaused"
-        class="btn danger"
-        @click="resetTimer"
-      >
-        重置
-      </button>
+    <!-- 底部控制按钮（仅在计时时显示） -->
+    <div v-if="isRunning || isPaused" class="bottom-controls">
+      <div class="control-buttons">
+        <button
+          v-if="isRunning"
+          class="btn secondary"
+          @click="pauseTimer"
+        >
+          暂停
+        </button>
+        <button
+          v-if="isPaused"
+          class="btn success"
+          @click="resumeTimer"
+        >
+          继续
+        </button>
+        <button
+          class="btn danger"
+          @click="resetTimer"
+        >
+          重置
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -122,6 +162,12 @@ export default {
       if (selectedTime.value === 0) return 283
       const progress = (timeLeft.value / selectedTime.value) * 283
       return 283 - progress
+    })
+
+    const bigProgressOffset = computed(() => {
+      if (selectedTime.value === 0) return 502
+      const progress = (timeLeft.value / selectedTime.value) * 502
+      return 502 - progress
     })
 
     const formatTime = (seconds) => {
@@ -235,6 +281,7 @@ export default {
       timeOptions,
       statusText,
       progressOffset,
+      bigProgressOffset,
       formatTime,
       selectTime,
       startCustomTimer,
