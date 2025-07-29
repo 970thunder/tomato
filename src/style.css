@@ -297,6 +297,7 @@ body {
 .start-btn {
     font-size: 1.2rem;
     padding: 15px 30px;
+    margin-top: 10px;
     animation: bounce 2s infinite;
 }
 
@@ -439,52 +440,580 @@ body {
     transition: stroke-dashoffset 1s linear;
 }
 
+/* 庆祝弹窗样式 */
+.celebration-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.celebration-card {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.celebration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.celebration-header h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.close-btn:hover {
+    background: #ff6b6b;
+    color: white;
+    transform: scale(1.1);
+}
+
+.celebration-header:hover .close-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.close-btn span {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.celebration-content {
+    margin-bottom: 30px;
+}
+
+.tomato-success {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: bounce 1s ease-in-out;
+}
+
+.focus-time {
+    margin-bottom: 20px;
+}
+
+.time-label {
+    display: block;
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.time-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #333;
+    font-family: 'Courier New', monospace;
+}
+
+.success-message {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+.celebration-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 彩带效果 */
+.confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confettiFall linear infinite;
+    border-radius: 2px;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
 @media (max-width: 480px) {
+    #app {
+        max-width: 100%;
+        padding: 10px;
+    }
+
     .tomato-timer {
-        padding: 30px 20px;
-        border-radius: 25px;
+        padding: 20px 15px;
+        border-radius: 20px;
+        min-height: 350px;
     }
 
     .tomato-timer.timer-active {
-        padding: 20px 20px;
+        padding: 15px 15px;
+        min-height: 450px;
     }
 
     .tomato-icon {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
     }
 
     .tomato-icon::after {
-        font-size: 50px;
+        font-size: 40px;
     }
 
     .big-tomato-icon {
-        width: 150px;
-        height: 150px;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
     }
 
     .big-tomato-emoji {
-        font-size: 75px;
+        font-size: 60px;
     }
 
     .timer-display {
-        font-size: 2.5rem;
+        font-size: 2rem;
+        margin: 15px 0;
     }
 
     .big-timer-display {
-        font-size: 3rem;
+        font-size: 2.5rem;
+        margin: 15px 0;
+    }
+
+    .status-text {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .big-status-text {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
     }
 
     .time-buttons {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .time-btn {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+
+    .custom-time {
+        margin-top: 15px;
+        padding: 15px;
+        gap: 8px;
+    }
+
+    .custom-time input {
+        padding: 8px 12px;
+        width: 70px;
+        font-size: 0.9rem;
+    }
+
+    .custom-time label {
+        font-size: 0.9rem;
     }
 
     .control-buttons {
         flex-direction: column;
         align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
     }
 
     .btn {
-        width: 200px;
+        width: 180px;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .start-btn {
+        font-size: 1rem;
+        padding: 12px 25px;
+    }
+
+    .bottom-controls {
+        padding-top: 15px;
+    }
+
+    .bottom-controls .control-buttons {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .bottom-controls .btn {
+        width: auto;
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 360px) {
+    #app {
+        padding: 5px;
+    }
+
+    .tomato-timer {
+        padding: 15px 10px;
+        min-height: 320px;
+    }
+
+    .tomato-timer.timer-active {
+        padding: 10px 10px;
+        min-height: 400px;
+    }
+
+    .tomato-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 15px;
+    }
+
+    .tomato-icon::after {
+        font-size: 35px;
+    }
+
+    .big-tomato-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+    }
+
+    .big-tomato-emoji {
+        font-size: 50px;
+    }
+
+    .timer-display {
+        font-size: 1.8rem;
+        margin: 12px 0;
+    }
+
+    .big-timer-display {
+        font-size: 2.2rem;
+        margin: 12px 0;
+    }
+
+    .status-text {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .big-status-text {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+
+    .time-buttons {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .time-btn {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .custom-time {
+        margin-top: 12px;
+        padding: 12px;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .custom-time input {
+        padding: 6px 10px;
+        width: 60px;
+        font-size: 0.85rem;
+    }
+
+    .custom-time label {
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        width: 160px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    .start-btn {
+        font-size: 0.9rem;
+        padding: 10px 20px;
+    }
+
+    .bottom-controls .btn {
+        min-width: 70px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* 横屏适配 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .tomato-timer {
+        padding: 15px 20px;
+        min-height: 280px;
+    }
+
+    .tomato-timer.timer-active {
+        padding: 10px 20px;
+        min-height: 320px;
+    }
+
+    .tomato-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 15px;
+    }
+
+    .tomato-icon::after {
+        font-size: 30px;
+    }
+
+    .big-tomato-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 15px;
+    }
+
+    .big-tomato-emoji {
+        font-size: 40px;
+    }
+
+    .timer-display {
+        font-size: 1.5rem;
+        margin: 10px 0;
+    }
+
+    .big-timer-display {
+        font-size: 2rem;
+        margin: 10px 0;
+    }
+
+    .status-text {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .big-status-text {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+
+    .time-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .time-btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .custom-time {
+        margin-top: 10px;
+        padding: 10px;
+        gap: 6px;
+    }
+
+    .custom-time input {
+        padding: 6px 8px;
+        width: 50px;
+        font-size: 0.8rem;
+    }
+
+    .custom-time label {
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        width: 120px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .start-btn {
+        font-size: 0.85rem;
+        padding: 8px 16px;
+    }
+
+    .bottom-controls .btn {
+        min-width: 60px;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}
+
+/* 庆祝弹窗移动端适配 */
+@media (max-width: 480px) {
+    .celebration-card {
+        padding: 25px 20px;
+        margin: 15px;
+        max-width: 90%;
+    }
+
+    .celebration-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .tomato-success {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+    }
+
+    .time-value {
+        font-size: 2rem;
+    }
+
+    .success-message {
+        font-size: 1rem;
+    }
+
+    .celebration-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .celebration-actions .btn {
+        width: 180px;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .celebration-card {
+        padding: 20px 15px;
+        margin: 10px;
+    }
+
+    .celebration-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .tomato-success {
+        font-size: 2rem;
+        margin-bottom: 12px;
+    }
+
+    .time-value {
+        font-size: 1.8rem;
+    }
+
+    .success-message {
+        font-size: 0.9rem;
+    }
+
+    .celebration-actions .btn {
+        width: 160px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+/* 横屏适配庆祝弹窗 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .celebration-card {
+        padding: 20px 25px;
+        max-height: 70vh;
+    }
+
+    .celebration-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .tomato-success {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .time-value {
+        font-size: 1.8rem;
+    }
+
+    .success-message {
+        font-size: 0.9rem;
+    }
+
+    .celebration-actions {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .celebration-actions .btn {
+        width: 120px;
+        padding: 8px 12px;
+        font-size: 0.8rem;
     }
 }

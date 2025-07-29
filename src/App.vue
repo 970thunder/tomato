@@ -1,5 +1,45 @@
 <template>
   <div class="tomato-timer" :class="{ 'timer-active': isRunning || isPaused }">
+    <!-- 庆祝弹窗 -->
+    <div v-if="showCelebration" class="celebration-overlay">
+      <!-- 彩带效果 -->
+      <div class="confetti-container">
+        <div v-for="i in 50" :key="i" class="confetti" :style="getConfettiStyle(i)"></div>
+      </div>
+
+      <!-- 庆祝卡片 -->
+      <div class="celebration-card">
+        <div class="celebration-header">
+          <h2>🎉 专注完成！</h2>
+          <div class="close-btn" @click="closeCelebration" @mouseenter="showCloseBtn = true"
+            @mouseleave="showCloseBtn = false">
+            <span v-if="showCloseBtn">×</span>
+          </div>
+        </div>
+
+        <div class="celebration-content">
+          <div class="tomato-success">🍅</div>
+          <div class="focus-time">
+            <span class="time-label">专注时间</span>
+            <span class="time-value">{{ formatTime(selectedTime) }}</span>
+          </div>
+          <div class="success-message">
+            恭喜你完成了这次专注！<br>
+            休息一下，准备下一次挑战吧！
+          </div>
+        </div>
+
+        <div class="celebration-actions">
+          <button class="btn success" @click="restartTimer">
+            再来一次
+          </button>
+          <button class="btn secondary" @click="closeCelebration">
+            返回首页
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 大番茄时钟（仅在计时时显示） -->
     <div v-if="isRunning || isPaused" class="big-tomato-clock">
       <div class="big-tomato-icon">
@@ -54,7 +94,7 @@
       <!-- 自定义时间输入 -->
       <div class="custom-time">
         <label>自定义时间:</label>
-        <input v-model="customMinutes" type="number" min="1" max="120" placeholder="分钟"
+        <input v-model="customMinutes" type="number" min="1" max="180" placeholder="分钟"
           @keyup.enter="startCustomTimer" />
         <button class="btn secondary" @click="startCustomTimer">
           开始
@@ -97,6 +137,8 @@ export default {
     const isPaused = ref(false)
     const selectedTime = ref(0)
     const customMinutes = ref('')
+    const showCelebration = ref(false)
+    const showCloseBtn = ref(false)
     let timer = null
 
     const timeOptions = [
@@ -144,7 +186,7 @@ export default {
 
     const startCustomTimer = () => {
       const minutes = parseInt(customMinutes.value)
-      if (minutes && minutes > 0 && minutes <= 120) {
+      if (minutes && minutes > 0 && minutes <= 180) {
         const seconds = minutes * 60
         selectTime(seconds)
         startTimer()
@@ -162,6 +204,8 @@ export default {
             clearInterval(timer)
             isRunning.value = false
             isPaused.value = false
+            // 显示庆祝弹窗
+            showCelebration.value = true
             // 播放提示音
             playNotification()
           }
@@ -188,6 +232,34 @@ export default {
       isRunning.value = false
       isPaused.value = false
       timeLeft.value = selectedTime.value
+    }
+
+    const closeCelebration = () => {
+      showCelebration.value = false
+      showCloseBtn.value = false
+      resetTimer()
+    }
+
+    const restartTimer = () => {
+      showCelebration.value = false
+      showCloseBtn.value = false
+      timeLeft.value = selectedTime.value
+      startTimer()
+    }
+
+    const getConfettiStyle = (index) => {
+      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd']
+      const color = colors[index % colors.length]
+      const left = Math.random() * 100
+      const animationDelay = Math.random() * 3
+      const animationDuration = 3 + Math.random() * 2
+
+      return {
+        left: `${left}%`,
+        backgroundColor: color,
+        animationDelay: `${animationDelay}s`,
+        animationDuration: `${animationDuration}s`
+      }
     }
 
     const playNotification = () => {
@@ -240,13 +312,18 @@ export default {
       statusText,
       progressOffset,
       bigProgressOffset,
+      showCelebration,
+      showCloseBtn,
       formatTime,
       selectTime,
       startCustomTimer,
       startTimer,
       pauseTimer,
       resumeTimer,
-      resetTimer
+      resetTimer,
+      closeCelebration,
+      restartTimer,
+      getConfettiStyle
     }
   }
 }
