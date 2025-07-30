@@ -43,10 +43,10 @@
     <!-- 大番茄时钟（仅在计时时显示） -->
     <div v-if="isRunning || isPaused" class="big-tomato-clock">
       <div class="big-tomato-icon">
-        <svg class="big-progress-ring" width="200" height="200">
-          <circle class="bg" cx="100" cy="100" r="80" />
-          <circle class="progress" cx="100" cy="100" r="80" stroke-dasharray="502.655"
-            :stroke-dashoffset="bigProgressOffset" />
+        <svg class="big-progress-ring" :width="bigRingSize" :height="bigRingSize">
+          <circle class="bg" :cx="bigRingSize / 2" :cy="bigRingSize / 2" :r="bigRingRadius" />
+          <circle class="progress" :cx="bigRingSize / 2" :cy="bigRingSize / 2" :r="bigRingRadius"
+            :stroke-dasharray="bigCircumference" :stroke-dashoffset="bigProgressOffset" />
         </svg>
         <div class="big-tomato-emoji">🍅</div>
       </div>
@@ -66,10 +66,10 @@
     <div v-if="!isRunning && !isPaused" class="initial-interface">
       <!-- 番茄图标 -->
       <div class="tomato-icon">
-        <svg class="progress-ring" width="120" height="120">
-          <circle class="bg" cx="60" cy="60" r="45" />
-          <circle class="progress" cx="60" cy="60" r="45" stroke-dasharray="282.743"
-            :stroke-dashoffset="progressOffset" />
+        <svg class="progress-ring" :width="normalRingSize" :height="normalRingSize">
+          <circle class="bg" :cx="normalRingSize / 2" :cy="normalRingSize / 2" :r="normalRingRadius" />
+          <circle class="progress" :cx="normalRingSize / 2" :cy="normalRingSize / 2" :r="normalRingRadius"
+            :stroke-dasharray="normalCircumference" :stroke-dashoffset="progressOffset" />
         </svg>
       </div>
 
@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, onMounted } from 'vue'
 
 export default {
   name: 'TomatoTimer',
@@ -139,6 +139,7 @@ export default {
     const customMinutes = ref('')
     const showCelebration = ref(false)
     const showCloseBtn = ref(false)
+    const windowWidth = ref(window.innerWidth)
     let timer = null
 
     const timeOptions = [
@@ -146,6 +147,37 @@ export default {
       { label: '30分钟', value: 30 * 60 },
       { label: '1小时', value: 60 * 60 }
     ]
+
+    // 响应式圆环尺寸
+    const normalRingSize = computed(() => {
+      if (windowWidth.value <= 360) return 80
+      if (windowWidth.value <= 480) return 90
+      if (windowWidth.value <= 768) return 100
+      return 120
+    })
+
+    const bigRingSize = computed(() => {
+      if (windowWidth.value <= 360) return 120
+      if (windowWidth.value <= 480) return 140
+      if (windowWidth.value <= 768) return 160
+      return 200
+    })
+
+    const normalRingRadius = computed(() => {
+      return normalRingSize.value * 0.375 // 45/120 的比例
+    })
+
+    const bigRingRadius = computed(() => {
+      return bigRingSize.value * 0.4 // 80/200 的比例
+    })
+
+    const normalCircumference = computed(() => {
+      return 2 * Math.PI * normalRingRadius.value
+    })
+
+    const bigCircumference = computed(() => {
+      return 2 * Math.PI * bigRingRadius.value
+    })
 
     const statusText = computed(() => {
       if (timeLeft.value === 0) return '选择时间开始专注'
@@ -155,19 +187,25 @@ export default {
     })
 
     const progressOffset = computed(() => {
-      if (selectedTime.value === 0) return 282.743
-      // 圆周长 = 2 * π * r = 2 * 3.14159 * 45 ≈ 282.743
-      const circumference = 2 * Math.PI * 45
-      const progress = (timeLeft.value / selectedTime.value) * circumference
-      return progress
+      if (selectedTime.value === 0 || timeLeft.value === 0) {
+        // 没有选择时间时，或倒计时结束时
+        return selectedTime.value === 0 ? normalCircumference.value : 0
+      }
+      // 计算剩余进度：剩余时间越多，offset越大（显示的圆环越少）
+      const remainingRatio = timeLeft.value / selectedTime.value
+      const offset = remainingRatio * normalCircumference.value
+      return offset
     })
 
     const bigProgressOffset = computed(() => {
-      if (selectedTime.value === 0) return 502.655
-      // 圆周长 = 2 * π * r = 2 * 3.14159 * 80 ≈ 502.655
-      const circumference = 2 * Math.PI * 80
-      const progress = (timeLeft.value / selectedTime.value) * circumference
-      return progress
+      if (selectedTime.value === 0 || timeLeft.value === 0) {
+        // 没有选择时间时，或倒计时结束时
+        return selectedTime.value === 0 ? bigCircumference.value : 0
+      }
+      // 计算剩余进度：剩余时间越多，offset越大（显示的圆环越少）
+      const remainingRatio = timeLeft.value / selectedTime.value
+      const offset = remainingRatio * bigCircumference.value
+      return offset
     })
 
     const formatTime = (seconds) => {
@@ -290,16 +328,26 @@ export default {
       }
     }
 
+    const handleResize = () => {
+      windowWidth.value = window.innerWidth
+    }
+
     // 请求通知权限
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission()
     }
 
-    // 组件卸载时清理定时器
+    // 组件挂载时添加窗口尺寸监听
+    onMounted(() => {
+      window.addEventListener('resize', handleResize)
+    })
+
+    // 组件卸载时清理定时器和事件监听
     onUnmounted(() => {
       if (timer) {
         clearInterval(timer)
       }
+      window.removeEventListener('resize', handleResize)
     })
 
     return {
@@ -314,6 +362,12 @@ export default {
       bigProgressOffset,
       showCelebration,
       showCloseBtn,
+      normalRingSize,
+      bigRingSize,
+      normalRingRadius,
+      bigRingRadius,
+      normalCircumference,
+      bigCircumference,
       formatTime,
       selectTime,
       startCustomTimer,
